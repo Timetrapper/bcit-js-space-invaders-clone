@@ -1,0 +1,53 @@
+body, html { 
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#starfield {
+    width:1000px;
+    height:800px;
+    position: absolute;
+    /* border: 10px solid #333; */
+    left: 0px;
+    top: 0px;
+}
+
+#defender {
+    background-image: url('../img/defender.png');
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    top: 700px;
+    left: 500px;
+}
+
+.invader {
+    background-image: url('../img/invader.png');
+    position: absolute;
+    width: 32px;
+    height: 32px;
+}
+
+/* Allow invaders anywhere in the background */
+#invaders {
+    width:1000px;
+    height:800px;
+    position: absolute;
+}
+
+/* Allow missiles anywhere in the background */
+#missiles {
+    width:1000px;
+    height:800px;
+    position: absolute;
+}
+
+.missile {
+    background-image: url('../img/missile.png');
+    position: absolute;
+    width: 16px;
+    height: 16px;
+}

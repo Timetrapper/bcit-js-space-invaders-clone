@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- dojo -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>JavaScript Project 01 - Space Invaders</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- <script src="js/spaceinvaders.js"></script> -->
+    <script src="js/starfield.js"></script>
+</head>
+
+<!-- 
+BUG LIST:
+- When miltiple missiles are fired, the first to hit the enemy "deletes" it,
+but the other missiles hit an "undefined" enemy before it can dissapear. Error:
+Uncaught TypeError: Cannot read property 'top' of undefined
+    at missileHit (index.html:212)
+    at gameLoop (index.html:240)
+
+
+
+
+FEATURES TO ADD:
+- End game if enemies reach bottom
+- Start game on "space"
+- Score
+- Enemies move left and right
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ -->
+
+<body>
+    <!-- Create the starfield -->
+    <div id='starfield'></div>
+
+    <!-- Create the defender -->
+    <div id='defender'></div>
+
+    <!-- Create the enemies -->
+    <div id='invaders'></div>
+
+    <!-- Create the missiles -->
+    <div id='missiles'></div>
+
+    <script>
+        // KeyCodes:
+        var LEFT_KEY = 37;
+        var RIGHT_KEY = 39;
+        var SPACE_KEY = 32;
+        var SHIP_MOVEMENT = 5;
+        var MISSILE_MOVEMENT = 10;
+        var INVADER_MOVEMENT = 1;
+        var MAX_MISSILES = 5;
+
+        // Misc variables:
+        var firing;
+        var lastGameLoop = 0;
+
+        // Place the starfield
+        var container = document.getElementById('starfield');
+        var starfield = new Starfield();
+        starfield.initialize(container);
+        starfield.start();  
+
+        var defender = document.createElement("Object");
+        defender.src = '../img/defender.png';
+        defender.id = "defender";
+        defender.left = 550;
+        defender.top = 700;
+        defender.width = 32;
+        defender.height = 32;     
+
+        // Create the defender:
+        var defender = new Object();
+        defender.element = 'defender';
+        defender.left = 550; 
+        defender.top = 700;
+        defender.width = 32;
+        defender.height = 32;
+
+        // Create a missile:
+        var missile = new Object();
+        missile.element = 'missile';
+        missile.width = 16;
+        missile.height = 16;
+
+        // Create an invader:
+        var invader = new Object();
+        invader.element = 'invader';
+        invader.width = 32;
+        invader.height = 32;
+
+        // Create the ship controls:
+        var shipControl = new Object();
+
+        // Create the missiles:
+        var missiles = [];
+        //missiles.length = MAX_MISSILES;
+
+        // Create the enemies:
+        var invaders = [
+        { left: 200, top: 100 },
+        { left: 300, top: 100 },
+        { left: 400, top: 100 },
+        { left: 500, top: 100 },
+        { left: 600, top: 100 },
+        { left: 700, top: 100 },
+        { left: 200, top: 175 },
+        { left: 300, top: 175 },
+        { left: 400, top: 175 },
+        { left: 500, top: 175 },
+        { left: 600, top: 175 },
+        { left: 700, top: 175 }
+        ];
+
+        // Control ship based on key pressed
+        function toggleKey(keyCode, isPressed) {
+            if (keyCode == LEFT_KEY) {
+                shipControl.left = isPressed;
+            }
+
+            if (keyCode == RIGHT_KEY) {
+                shipControl.right = isPressed;
+            }
+
+            if (keyCode == SPACE_KEY) {
+                shipControl.fire = isPressed;
+            }
+        }
+
+        // Draw the characters
+        function showCharacters() {
+            setPosition(defender);
+            drawInvaders();
+            //setPosition(missile);
+        }
+
+        function controlPosition(character) {
+            if (character.left < 200) {
+                character.left = 200;
+            }
+
+            if (character.top < 600 || character.top > 600) {
+                character.top = 600;
+            }
+
+            if (character.left + character.width > 820) {
+                character.left =  820 - character.width;
+            }
+
+            if (character.top + character.height > 820) {
+                character.top =  820 - character.height;
+            }
+
+        }
+
+        function setPosition(character) {
+            var e = document.getElementById(character.element);
+            e.style.left = character.left + 'px';
+            e.style.top = character.top + 'px';
+        }
+
+        function drawMissiles() {
+            document.getElementById('missiles').innerHTML = "";
+            for (var missile = 0; missile < missiles.length; missile++)
+            {
+                // (${} is used as a pattern to show JS what to look at and evaluate)
+                document.getElementById('missiles').innerHTML +=
+                `<div class = 'missile' style =
+                'left:${missiles[missile].left}px;
+                top:${missiles[missile].top}px;'></div>`;
+                
+            }
+        }
+
+        function drawInvaders() {
+            document.getElementById('invaders').innerHTML = "";
+            for (var invader = 0; invader < invaders.length; invader++)
+            {
+                // (${} is used as a pattern to show JS what to look at and evaluate)
+                document.getElementById('invaders').innerHTML +=
+                `<div class = 'invader' style =
+                'left:${invaders[invader].left}px;
+                top:${invaders[invader].top}px;'></div>`;
+                
+            }
+        }
+
+        function moveMissiles() {
+            for (var missile = 0; missile < missiles.length; missile++) {
+                missiles[missile].top -= MISSILE_MOVEMENT;
+                drawMissiles();
+            }
+        }
+
+        function moveInvaders() {
+            for (var invader = 0; invader < invaders.length; invader++) {
+                invaders[invader].top += INVADER_MOVEMENT;
+                drawInvaders();
+            }
+        }
+
+        function checkControls() {
+            // Move ship left:
+            if (shipControl.left) {
+                defender.left -= SHIP_MOVEMENT;
+            }
+
+            // Move ship right:
+            if (shipControl.right) {
+                defender.left += SHIP_MOVEMENT;
+            }
+
+            // Fire laser:
+            if (shipControl.fire) {
+                missiles.push({
+                    left: defender.left + 8,
+                    top: defender.top
+                })
+            }
+
+            controlPosition(defender);
+        }
+
+        function missileHit() {
+            for (var invader = 0; invader < invaders.length; invader++) {
+                for (var missile = 0; missile < missiles.length; missile++) {
+                    // "destroy" enemies with a direct hit:
+                    if (
+                        (missiles[missile].top <= invaders[invader].top + 32) &&
+                        (missiles[missile].top >= invaders[invader].top) &&
+                        (missiles[missile].left >= invaders[invader].left) &&
+                        (missiles[missile].left <= invaders[invader].left + 32)
+                    ){
+                        //alert('hit!');
+                        invaders.splice(invader, 1);
+                        missiles.splice(missile, 1);
+                    }
+
+                    // Remove enemies when they leave the screen bottom:
+                    // (Change to end game)
+
+                    // Remove missiles when they leave the screen top:
+                    else if (missiles[missile].top <= 0) {
+                        missiles.splice(missile, 1);
+                        console.log('missile removed');
+                    } 
+                }
+            }
+        }
+
+        // This will keep the timing consistent, to eliminate odd motion
+        // https://stackoverflow.com/questions/1955687/best-way-for-simple-game-loop-in-javascript
+        function gameLoop() {
+            showCharacters();
+            checkControls();
+            moveMissiles();
+            moveInvaders();
+            missileHit();
+            setTimeout(gameLoop, 50); // This will call gameLoop every 10ms
+        }
+
+        document.onkeydown = function(event) {
+            //console.log(event.keyCode);
+            toggleKey(event.keyCode, true);
+        }
+
+        document.onkeyup = function(event) {
+            //console.log(event.keyCode);
+            toggleKey(event.keyCode, false);
+        }
+
+        gameLoop(); // Run the game
+    </script>
+</body>
+
+</html>
