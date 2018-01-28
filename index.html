@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <!-- dojo -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -58,11 +59,11 @@ FEATURES TO ADD:
         var starfield = document.createElement('starfield');
         starfield.id = 'starfield';
         document.body.appendChild(starfield);
-        
+
         var background = document.getElementById('starfield');
         var starfield = new Starfield();
         starfield.initialize(background);
-        starfield.start();  
+        starfield.start();
 
         // Create the defender
         var defender = document.createElement('defender');
@@ -71,7 +72,7 @@ FEATURES TO ADD:
 
         var defender = new Object();
         // defender.element = 'defender';
-        defender.left = 500; 
+        defender.left = 500;
         defender.top = 700;
 
         // Create the invaders
@@ -80,7 +81,7 @@ FEATURES TO ADD:
         document.body.appendChild(invaders);
         var invader = new Object();
         invader.element = 'invader';
-                
+
         // Create the missiles
         var missiles = document.createElement('missiles');
         missiles.id = 'missiles';
@@ -131,6 +132,7 @@ FEATURES TO ADD:
             drawInvaders();
         }
 
+
         function controlPosition() {
             var defender = document.getElementById('defender');
 
@@ -143,11 +145,11 @@ FEATURES TO ADD:
             }
 
             if (defender.left + defender.width > 820) {
-                defender.left =  820 - defender.width;
+                defender.left = 820 - defender.width;
             }
 
             if (defender.top + defender.height > 820) {
-                defender.top =  820 - defender.height;
+                defender.top = 820 - defender.height;
             }
         }
 
@@ -159,14 +161,13 @@ FEATURES TO ADD:
             e.style.left = defender.left + 'px';
             e.style.top = defender.top + 'px';
         }
-        
+
         function drawInvaders() {
             document.getElementById('invaders').innerHTML = "";
-            for (var invader = 0; invader < invaders.length; invader++)
-            {
+            for (var invader = 0; invader < invaders.length; invader++) {
                 // (${} is used as a pattern to show JS what to look at and evaluate)
                 document.getElementById('invaders').innerHTML +=
-                `<div class = 'invader' style =
+                    `<div class = 'invader' style =
                 'left:${invaders[invader].left}px;
                 top:${invaders[invader].top}px;'></div>`;
             }
@@ -174,14 +175,13 @@ FEATURES TO ADD:
 
         function drawMissiles() {
             document.getElementById('missiles').innerHTML = "";
-            for (var missile = 0; missile < missiles.length; missile++)
-            {
+            for (var missile = 0; missile < missiles.length; missile++) {
                 // (${} is used as a pattern to show JS what to look at and evaluate)
                 document.getElementById('missiles').innerHTML +=
-                `<div class = 'missile' style =
+                    `<div class = 'missile' style =
                 'left:${missiles[missile].left}px;
                 top:${missiles[missile].top}px;'></div>`;
-                
+
             }
         }
 
@@ -230,7 +230,7 @@ FEATURES TO ADD:
                         (missiles[missile].top >= invaders[invader].top) &&
                         (missiles[missile].left >= invaders[invader].left) &&
                         (missiles[missile].left <= invaders[invader].left + 32)
-                    ){
+                    ) {
                         //alert('hit!');
                         missiles.splice(missile, 1);
                         invaders.splice(invader, 1);
@@ -243,7 +243,7 @@ FEATURES TO ADD:
                     else if (missiles[missile].top <= 0) {
                         missiles.splice(missile, 1);
                         console.log('missile removed');
-                    } 
+                    }
                 }
             }
         }
@@ -256,18 +256,29 @@ FEATURES TO ADD:
             moveMissiles();
             moveInvaders();
             missileHit();
-            setTimeout(gameLoop, 50); // This will call gameLoop every 10ms
+            setTimeout(gameLoop, 50); // This will call gameLoop every 50ms
         }
 
-        document.onkeydown = function(event) {
+        document.onkeydown = function (event) {
             toggleKey(event.keyCode, true);
         }
 
-        document.onkeyup = function(event) {
+        document.onkeyup = function (event) {
             toggleKey(event.keyCode, false);
         }
 
-        gameLoop(); // Run the game
+        // Press 'enter' to start game:
+        // var myh1 = document.createElement('h1');
+        // var mytextnode = document.createTextNode('PRESS Enter TO START GAME');
+        // myh1.appendChild(mytextnode);
+        // document.body.appendChild(myh1);
+
+        // document.body.onkeyup = function (e) {
+        // if (e.keyCode == 13) {
+        //     //location.reload();
+        //     gameLoop(); // Run the game
+        // }
+    }
     </script>
 </body>
 
