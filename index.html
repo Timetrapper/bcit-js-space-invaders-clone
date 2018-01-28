@@ -13,91 +13,86 @@
 
 <!-- 
 BUG LIST:
-- When miltiple missiles are fired, the first to hit the enemy "deletes" it,
-but the other missiles hit an "undefined" enemy before it can dissapear. Error:
+- Multiple missile hits on bottom right enemy causes game to freeze. Error:
     Uncaught TypeError: Cannot read property 'top' of undefined
         at missileHit (index.html:212)
         at gameLoop (index.html:240)
 
 - Not integrating "appendChild"
 
+- Sort out missiles array and elements
+
+- Missile hits are not entirely accurate
 
 FEATURES TO ADD:
 - End game if enemies reach bottom
-- End game if enemies hit invader
+- End game if enemies hit invader (or have lives?)
 - Start game on "space"
 - Score
 - Enemies move left and right
+- No "rapid fire" on missiles
+- Enemies drop bombs
 
- -->
+-->
 
 <body>
-    <!-- Create the starfield -->
-    <div id='starfield'></div>
-
-    <!-- Create the defender -->
-    <div id='defender'></div>
-
-    <!-- Create the enemies -->
-    <div id='invaders'></div>
-
-    <!-- Create the missiles -->
-    <div id='missiles'></div>
-
     <script>
         // KeyCodes:
         var LEFT_KEY = 37;
         var RIGHT_KEY = 39;
         var SPACE_KEY = 32;
+
+        // Constants:
         var SHIP_MOVEMENT = 5;
-        var MISSILE_MOVEMENT = 10;
-        var INVADER_MOVEMENT = 1;
-        var MAX_MISSILES = 5;
+        var MISSILE_MOVEMENT = 12;
+        var INVADER_MOVEMENT = 1.5;
 
         // Misc variables:
         var firing;
         var lastGameLoop = 0;
 
-        // Place the starfield
-        var container = document.getElementById('starfield');
+        // Create the ship controls:
+        var shipControl = new Object();
+
+        // Create the starfield
+        var starfield = document.createElement('starfield');
+        starfield.id = 'starfield';
+        document.body.appendChild(starfield);
+        
+        var background = document.getElementById('starfield');
         var starfield = new Starfield();
-        starfield.initialize(container);
+        starfield.initialize(background);
         starfield.start();  
 
-        var defender = document.createElement("Object");
-        defender.src = '../img/defender.png';
-        defender.id = "defender";
-        defender.left = 550;
-        defender.top = 700;
-        defender.width = 32;
-        defender.height = 32;     
+        // Create the defender
+        var defender = document.createElement('defender');
+        defender.id = 'defender';
+        document.body.appendChild(defender);
 
-        // Create the defender:
         var defender = new Object();
-        defender.element = 'defender';
-        defender.left = 550; 
+        // defender.element = 'defender';
+        defender.left = 500; 
         defender.top = 700;
-        defender.width = 32;
-        defender.height = 32;
 
-        // Create a missile:
+        // Create the invaders
+        var invaders = document.createElement('invaders');
+        invaders.id = 'invaders';
+        document.body.appendChild(invaders);
+        var invader = new Object();
+        invader.element = 'invader';
+                
+        // Create the missiles
+        var missiles = document.createElement('missiles');
+        missiles.id = 'missiles';
+        document.body.appendChild(missiles);
+
         var missile = new Object();
         missile.element = 'missile';
         missile.width = 16;
         missile.height = 16;
 
-        // Create an invader:
-        var invader = new Object();
-        invader.element = 'invader';
-        invader.width = 32;
-        invader.height = 32;
-
-        // Create the ship controls:
-        var shipControl = new Object();
-
         // Create the missiles:
         var missiles = [];
-        //missiles.length = MAX_MISSILES;
 
         // Create the enemies:
         var invaders = [
@@ -132,34 +127,49 @@ FEATURES TO ADD:
 
         // Draw the characters
         function showCharacters() {
-            setPosition(defender);
+            drawDefender(defender);
             drawInvaders();
-            //setPosition(missile);
         }
 
-        function controlPosition(character) {
-            if (character.left < 200) {
-                character.left = 200;
+        function controlPosition() {
+            var defender = document.getElementById('defender');
+
+            if (defender.left < 200) {
+                defender.left = 200;
             }
 
-            if (character.top < 600 || character.top > 600) {
-                character.top = 600;
+            if (defender.top < 600 || defender.top > 600) {
+                defender.top = 600;
             }
 
-            if (character.left + character.width > 820) {
-                character.left =  820 - character.width;
+            if (defender.left + defender.width > 820) {
+                defender.left =  820 - defender.width;
             }
 
-            if (character.top + character.height > 820) {
-                character.top =  820 - character.height;
+            if (defender.top + defender.height > 820) {
+                defender.top =  820 - defender.height;
             }
-
         }
 
-        function setPosition(character) {
-            var e = document.getElementById(character.element);
-            e.style.left = character.left + 'px';
-            e.style.top = character.top + 'px';
+        // function setPosition(character) {
+        // }
+
+        function drawDefender(defender) {
+            var e = document.getElementById('defender');
+            e.style.left = defender.left + 'px';
+            e.style.top = defender.top + 'px';
+        }
+        
+        function drawInvaders() {
+            document.getElementById('invaders').innerHTML = "";
+            for (var invader = 0; invader < invaders.length; invader++)
+            {
+                // (${} is used as a pattern to show JS what to look at and evaluate)
+                document.getElementById('invaders').innerHTML +=
+                `<div class = 'invader' style =
+                'left:${invaders[invader].left}px;
+                top:${invaders[invader].top}px;'></div>`;
+            }
         }
 
         function drawMissiles() {
@@ -171,19 +181,6 @@ FEATURES TO ADD:
                 `<div class = 'missile' style =
                 'left:${missiles[missile].left}px;
                 top:${missiles[missile].top}px;'></div>`;
-                
-            }
-        }
-
-        function drawInvaders() {
-            document.getElementById('invaders').innerHTML = "";
-            for (var invader = 0; invader < invaders.length; invader++)
-            {
-                // (${} is used as a pattern to show JS what to look at and evaluate)
-                document.getElementById('invaders').innerHTML +=
-                `<div class = 'invader' style =
-                'left:${invaders[invader].left}px;
-                top:${invaders[invader].top}px;'></div>`;
                 
             }
         }
@@ -221,7 +218,7 @@ FEATURES TO ADD:
                 })
             }
 
-            controlPosition(defender);
+            controlPosition();
         }
 
         function missileHit() {
@@ -235,8 +232,8 @@ FEATURES TO ADD:
                         (missiles[missile].left <= invaders[invader].left + 32)
                     ){
                         //alert('hit!');
-                        invaders.splice(invader, 1);
                         missiles.splice(missile, 1);
+                        invaders.splice(invader, 1);
                     }
 
                     // Remove enemies when they leave the screen bottom:
@@ -263,12 +260,10 @@ FEATURES TO ADD:
         }
 
         document.onkeydown = function(event) {
-            //console.log(event.keyCode);
             toggleKey(event.keyCode, true);
         }
 
         document.onkeyup = function(event) {
-            //console.log(event.keyCode);
             toggleKey(event.keyCode, false);
         }
 

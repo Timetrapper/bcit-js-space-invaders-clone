@@ -7,10 +7,9 @@ body, html {
 }
 
 #starfield {
-    width:1000px;
-    height:800px;
+    width: 1000px;
+    height: 800px;
     position: absolute;
-    /* border: 10px solid #333; */
     left: 0px;
     top: 0px;
 }
