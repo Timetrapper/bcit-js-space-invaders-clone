@@ -19,8 +19,6 @@ BUG LIST:
         at missileHit (index.html:212)
         at gameLoop (index.html:240)
 
-- Not integrating "appendChild"
-
 - Sort out missiles array and elements
 
 - Missile hits are not entirely accurate
@@ -42,6 +40,7 @@ FEATURES TO ADD:
         var LEFT_KEY = 37;
         var RIGHT_KEY = 39;
         var SPACE_KEY = 32;
+        var ENTER_KEY = 13;
 
         // Constants:
         var SHIP_MOVEMENT = 5;
@@ -51,6 +50,7 @@ FEATURES TO ADD:
         // Misc variables:
         var firing;
         var lastGameLoop = 0;
+        var readytostart = true;
 
         // Create the ship controls:
         var shipControl = new Object();
@@ -124,6 +124,11 @@ FEATURES TO ADD:
             if (keyCode == SPACE_KEY) {
                 shipControl.fire = isPressed;
             }
+
+            if (keyCode === ENTER_KEY && readytostart) {  //checks whether the pressed key is "Enter"
+                readytostart = false;
+                gameLoop();
+            }
         }
 
         // Draw the characters
@@ -152,9 +157,11 @@ FEATURES TO ADD:
                 defender.top = 820 - defender.height;
             }
         }
-
-        // function setPosition(character) {
-        // }
+        
+        function validate(e) {
+            var text = e.target.value;
+            //validation of the input...
+        }
 
         function drawDefender(defender) {
             var e = document.getElementById('defender');
@@ -232,6 +239,8 @@ FEATURES TO ADD:
                         (missiles[missile].left <= invaders[invader].left + 32)
                     ) {
                         //alert('hit!');
+                        //Change invader to explosion
+                        //document.getElementById("invaders[invader]").src = "img/explosion.gif";
                         missiles.splice(missile, 1);
                         invaders.splice(invader, 1);
                     }
@@ -266,8 +275,12 @@ FEATURES TO ADD:
         document.onkeyup = function (event) {
             toggleKey(event.keyCode, false);
         }
+    </script>
+</body>
 
-        // Press 'enter' to start game:
+</html>
+
+        <!-- // Press 'enter' to start game:
         // var myh1 = document.createElement('h1');
         // var mytextnode = document.createTextNode('PRESS Enter TO START GAME');
         // myh1.appendChild(mytextnode);
@@ -277,9 +290,4 @@ FEATURES TO ADD:
         // if (e.keyCode == 13) {
         //     //location.reload();
         //     gameLoop(); // Run the game
-        // }
-    }
-    </script>
-</body>
-
-</html>
+        // } -->
