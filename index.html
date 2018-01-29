@@ -16,22 +16,18 @@
 BUG LIST:
 - Multiple missile hits on bottom right enemy causes game to freeze. Error:
     Uncaught TypeError: Cannot read property 'top' of undefined
-        at missileHit (index.html:212)
+        at checkCollisions (index.html:212)
         at gameLoop (index.html:240)
-
 - Sort out missiles array and elements
-
 - Missile hits are not entirely accurate
 
 FEATURES TO ADD:
 - End game if enemies reach bottom
 - End game if enemies hit invader (or have lives?)
-- Start game on "space"
 - Score
 - Enemies move left and right
 - No "rapid fire" on missiles
 - Enemies drop bombs
-
 -->
 
 <body>
@@ -65,22 +61,27 @@ FEATURES TO ADD:
         starfield.initialize(background);
         starfield.start();
 
-        // Create the defender
+        // Display the 'game start' message:
+        var myh1 = document.createElement('h1');
+        var mytextnode = document.createTextNode('PRESS ENTER TO START');
+        myh1.appendChild(mytextnode);
+        document.body.appendChild(myh1);
+
+        // Create the defender:
         var defender = document.createElement('defender');
         defender.id = 'defender';
         document.body.appendChild(defender);
 
         var defender = new Object();
-        // defender.element = 'defender';
         defender.left = 500;
         defender.top = 700;
 
-        // Create the invaders
+        // Create the invaders:
         var invaders = document.createElement('invaders');
         invaders.id = 'invaders';
         document.body.appendChild(invaders);
         var invader = new Object();
-        invader.element = 'invader';
+        //invader.element = 'invader';
 
         // Create the missiles
         var missiles = document.createElement('missiles');
@@ -125,8 +126,10 @@ FEATURES TO ADD:
                 shipControl.fire = isPressed;
             }
 
-            if (keyCode === ENTER_KEY && readytostart) {  //checks whether the pressed key is "Enter"
+            // Checks whether the pressed key is "Enter", to start game:
+            if (keyCode === ENTER_KEY && readytostart) {
                 readytostart = false;
+                document.body.removeChild(myh1);
                 gameLoop();
             }
         }
@@ -136,7 +139,6 @@ FEATURES TO ADD:
             drawDefender(defender);
             drawInvaders();
         }
-
 
         function controlPosition() {
             var defender = document.getElementById('defender');
@@ -156,11 +158,6 @@ FEATURES TO ADD:
             if (defender.top + defender.height > 820) {
                 defender.top = 820 - defender.height;
             }
-        }
-        
-        function validate(e) {
-            var text = e.target.value;
-            //validation of the input...
         }
 
         function drawDefender(defender) {
@@ -228,7 +225,7 @@ FEATURES TO ADD:
             controlPosition();
         }
 
-        function missileHit() {
+        function checkCollisions() {
             for (var invader = 0; invader < invaders.length; invader++) {
                 for (var missile = 0; missile < missiles.length; missile++) {
                     // "destroy" enemies with a direct hit:
@@ -238,7 +235,6 @@ FEATURES TO ADD:
                         (missiles[missile].left >= invaders[invader].left) &&
                         (missiles[missile].left <= invaders[invader].left + 32)
                     ) {
-                        //alert('hit!');
                         //Change invader to explosion
                         //document.getElementById("invaders[invader]").src = "img/explosion.gif";
                         missiles.splice(missile, 1);
@@ -254,6 +250,11 @@ FEATURES TO ADD:
                         console.log('missile removed');
                     }
                 }
+
+                // End game when invaders reach bottom:
+                if (invaders[invader].top + 32 == 800) {
+                    gameloop = clearInterval(gameloop);
+                }
             }
         }
 
@@ -264,7 +265,7 @@ FEATURES TO ADD:
             checkControls();
             moveMissiles();
             moveInvaders();
-            missileHit();
+            checkCollisions();
             setTimeout(gameLoop, 50); // This will call gameLoop every 50ms
         }
 
